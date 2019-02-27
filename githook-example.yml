@@ -1,0 +1,10 @@
+server:
+  token: token
+
+taghandler:
+  project1:
+    jenkins_url: Jenkins_1
+    jenkins_token: build
+  project2:
+    jenkins_url: Jenkins_2
+    jenkins_token: build
