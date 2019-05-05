@@ -52,10 +52,8 @@ def make_app():
     taghandlers = config['taghandler']
     apps = []
     for h in taghandlers:
-        clsdict = {'jenkins_url': taghandlers[h]['jenkins_url'], 'jenkins_token': taghandlers[h]['jenkins_token']}
-        if 'trigger' in h:
-            clsdict.update(taghandlers[h]['trigger'])
-        tmpcls = types.new_class(h, (GitLabTagHook, ), {}, lambda ns:ns.update(clsdict))
+        clsdict = taghandlers[h]
+        tmpcls = types.new_class(h, (GitLabTagHook, ), {}, lambda ns: ns.update(clsdict))
         tmpcls.__module__ = __name__
         url = '/tag/' + h
         apps.append((url, tmpcls))
