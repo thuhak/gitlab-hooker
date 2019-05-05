@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+# author: thuhak.zhou@nio.com
 import types
 import json
 import logging
@@ -17,12 +19,13 @@ class GitLabHook(tornado.web.RequestHandler):
         if self.request.headers.get('Content-Type') != 'application/json':
             raise tornado.web.HTTPError(400, log_message='only accept json format')
         elif self.request.headers.get('X-Gitlab-Token') != config['server']['token']:
-            raise  tornado.web.HTTPError(403, log_message='access denied, check your token')
+            raise tornado.web.HTTPError(403, log_message='access denied, check your token')
 
 
 class GitLabTagHook(GitLabHook):
     jenkins_url = ''
     jenkins_token = ''
+    trigger = ['add', 'remove']
 
     def post(self):
         body = json.loads(self.request.body)
@@ -37,17 +40,21 @@ class GitLabTagHook(GitLabHook):
                 params['namespace'] = body['project']['namespace']
                 params['project'] = body['project']['name']
                 params['token'] = self.jenkins_token
-                requests.get(url=self.jenkins_url, params=params)
+                if params['action'] in self.trigger:
+                    requests.get(url=self.jenkins_url, params=params)
                 self.finish('finish')
             except Exception as e:
                 logging.error('request error: {}'.format(str(e)))
                 raise tornado.web.HTTPError(500)
+
 
 def make_app():
     taghandlers = config['taghandler']
     apps = []
     for h in taghandlers:
         clsdict = {'jenkins_url': taghandlers[h]['jenkins_url'], 'jenkins_token': taghandlers[h]['jenkins_token']}
+        if 'trigger' in h:
+            clsdict.update(taghandlers[h]['trigger'])
         tmpcls = types.new_class(h, (GitLabTagHook, ), {}, lambda ns:ns.update(clsdict))
         tmpcls.__module__ = __name__
         url = '/tag/' + h

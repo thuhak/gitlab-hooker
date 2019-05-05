@@ -8,3 +8,5 @@ taghandler:
   project2:
     jenkins_url: Jenkins_2
     jenkins_token: build
+    trigger:
+      - add

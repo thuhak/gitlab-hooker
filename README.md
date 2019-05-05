@@ -16,6 +16,8 @@ taghandler:
   project2:
     jenkins_url: Jenkins_2
     jenkins_token: build
+    trigger:                  #是否使用action过滤,add或者remove,用于仅在特定条件触发jenkins job
+      - add
 ```
 
 - 配置可以使用等价的json格式表示
