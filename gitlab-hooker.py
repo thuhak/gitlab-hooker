@@ -51,7 +51,7 @@ class GitLabTagHook(GitLabHook):
 def make_app():
     taghandlers = config['taghandler']
     apps = []
-    for h in taghandlers:
+    for h in taghandlers.keys():
         clsdict = taghandlers[h]
         tmpcls = types.new_class(h, (GitLabTagHook, ), {}, lambda ns: ns.update(clsdict))
         tmpcls.__module__ = __name__
